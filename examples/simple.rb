@@ -35,7 +35,9 @@ class C < A
   end
 end
 
-Callgraph.record do
+recorder = Callgraph::Recorders::Stream.new(STDOUT)
+
+Callgraph.record(recorder) do
   b = B.new
   def b.baz
   end
@@ -44,4 +46,4 @@ Callgraph.record do
 end
 
 puts
-Callgraph.record { C.new.bar }
+Callgraph.record(recorder) { C.new.bar }
