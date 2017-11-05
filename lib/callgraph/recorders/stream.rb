@@ -6,24 +6,11 @@ module Callgraph
         @stack_depth = 0
       end
 
-      def record(tracepoint_event)
-        case tracepoint_event.event
+      def record(event)
+        case event.type
         when :call
-          method_string = case classify(tracepoint_event)
-          when :class
-            "#{tracepoint_event.defined_class}.#{tracepoint_event.method_id}"
-          when :singleton_class
-            "#{tracepoint_event.self}(s).#{tracepoint_event.method_id}"
-          when :singleton_instance
-            "#{tracepoint_event.self.class}(s)##{tracepoint_event.method_id}"
-          when :instance
-            "#{tracepoint_event.defined_class}##{tracepoint_event.method_id}"
-          end
-
           @stream.write("  " * @stack_depth)
-          @stream.write(method_string)
-          @stream.write("\n")
-
+          @stream.write("#{event.method_string}\n")
           @stack_depth += 1
         else
           @stack_depth -= 1

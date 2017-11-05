@@ -1,3 +1,4 @@
+require "callgraph/event"
 require "callgraph/recorder"
 require "callgraph/recorders/stream"
 require "callgraph/tracer"
