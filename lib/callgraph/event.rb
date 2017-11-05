@@ -11,14 +11,16 @@ module Callgraph
       @tracepoint_event = tracepoint_event
     end
 
+    def receiver_class
+      @reciver_class ||= method_type == :class ? receiver : receiver.class
+    end
+
     def method_string
       @method_string ||= case method_type
       when :class
-        "#{defined_class}.#{method_name}"
-      when :singleton_class
-        "#{receiver}(s).#{method_name}"
+        "#{receiver_class}.#{method_name}"
       when :singleton_instance
-        "#{receiver.class}(s)##{method_name}"
+        "#{receiver_class}##{method_name} (singleton)"
       when :instance
         "#{defined_class}##{method_name}"
       end
@@ -28,7 +30,7 @@ module Callgraph
       @method_type ||= begin
         self_is_class = @tracepoint_event.self.class == Class
         if @tracepoint_event.defined_class.singleton_class?
-          self_is_class ? :singleton_class : :singleton_instance
+          self_is_class ? :class : :singleton_instance
         elsif self_is_class
           :class
         else
