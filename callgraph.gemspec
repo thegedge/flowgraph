@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Generate a ruby callgraph database"
   spec.description   = "Profile a piece of code and generate a call graph from it"
-  spec.homepage      = ""
+  spec.homepage      = "https://gedge.ca"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -29,6 +29,8 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  spec.add_dependency "sqlite3", "~> 1.3"
 
   spec.add_development_dependency "bundler", "~> 1.16.a"
   spec.add_development_dependency "rake", "~> 10.0"

@@ -1,5 +1,6 @@
 require "callgraph/event"
 require "callgraph/recorder"
+require "callgraph/recorders/sqlite"
 require "callgraph/recorders/stream"
 require "callgraph/tracer"
 require "callgraph/version"

@@ -35,7 +35,7 @@ class C < A
   end
 end
 
-recorder = Callgraph::Recorders::Stream.new(STDOUT)
+recorder = Callgraph::Recorders::Sqlite.new("foo.sqlite3")
 
 Callgraph.record(recorder) do
   b = B.new

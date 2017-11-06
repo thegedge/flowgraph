@@ -20,4 +20,3 @@ module Callgraph
     end
   end
 end
-
