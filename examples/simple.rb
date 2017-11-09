@@ -1,4 +1,5 @@
 require 'callgraph'
+require 'benchmark'
 
 class A
   def initialize
@@ -14,7 +15,7 @@ end
 
 class B < A
   def foo
-    baz
+    Benchmark.realtime { baz }
   end
 end
 

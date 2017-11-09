@@ -9,9 +9,8 @@ module Callgraph
 
       def record(event)
         if event.type == :call
-          #puts [event.method_name, event.defined_class, event.receiver].inspect
           database.execute(
-            "INSERT OR REPLACE INTO methods
+            "INSERT OR IGNORE INTO methods
               (name, class, path, line_number, type)
               VALUES(?, ?, ?, ?, ?)
             ",
@@ -28,19 +27,19 @@ module Callgraph
 
       def database
         @database ||= SQLite3::Database.new(@db_path).tap do |db|
-          db.execute <<-SQL
+          db.execute_batch("
             CREATE TABLE IF NOT EXISTS methods (
+              id integer PRIMARY KEY AUTOINCREMENT,
               name varchar(255),
               class varchar(255),
               path varchar(255),
               line_number integer,
-              type varchar(32),
-
-              PRIMARY KEY (name, class, type)
+              type varchar(32)
             );
 
+            CREATE UNIQUE INDEX IF NOT EXISTS unique_method ON methods(name, class, path, line_number, type);
             CREATE INDEX IF NOT EXISTS name ON methods(name);
-          SQL
+          ")
         end
       end
     end
