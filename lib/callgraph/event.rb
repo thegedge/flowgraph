@@ -30,7 +30,7 @@ module Callgraph
       when :class
         receiver_class.to_s
       when :singleton
-        receiver_class.to_s
+        defined_class.to_s.match(/#<Class:(.*)>/).captures[0]
       when :instance
         defined_class.to_s
       end
