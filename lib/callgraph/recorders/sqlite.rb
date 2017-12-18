@@ -11,15 +11,13 @@ module Callgraph
       def record(event)
         if event.type == :call
           @stack << store_event(event)
-          if @stack.length > 1
+          if event.parent
             database.execute(
               "INSERT OR IGNORE INTO method_calls(source, target) VALUES(?, ?)",
               @stack[-2],
               @stack[-1]
             )
           end
-        elsif event.type == :return
-          @stack.pop
         end
       end
 

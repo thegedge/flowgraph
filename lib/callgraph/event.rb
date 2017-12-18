@@ -7,12 +7,15 @@ module Callgraph
     def_delegator :@tracepoint_event, :self, :receiver
     def_delegator :@tracepoint_event, :defined_class
 
-    def initialize(tracepoint_event)
+    attr_reader :parent
+
+    def initialize(tracepoint_event, parent: nil)
       @tracepoint_event = tracepoint_event
+      @parent = parent
     end
 
     def receiver_class
-      @reciver_class ||= method_type == :class ? receiver : receiver.class
+      method_type == :class ? receiver : receiver.class
     end
 
     def defined_class_name
@@ -27,11 +30,11 @@ module Callgraph
     end
 
     def defined_path
-      @defined_path ||= source_location[0]
+      source_location[0]
     end
 
     def defined_line_number
-      @defined_line_number ||= source_location[1]
+      source_location[1]
     end
 
     def method_string
