@@ -24,19 +24,15 @@ module Callgraph
 
     subject { Event.new(tp_event, start_time: start_time, end_time: end_time, parent: parent) }
 
-    context :time_taken do
+    context '#time_taken' do
       context "when given a start and end time" do
-        it "must return difference in start and end times" do
-          expect(subject.time_taken).to be_within(1e-10).of(1.03125)
-        end
+        it { expect(subject.time_taken).to be_within(1e-10).of(1.03125) }
       end
 
       context "with no start time" do
         let(:start_time) { nil }
 
-        it "must return nil" do
-          expect(subject.time_taken).to be_nil
-        end
+        it { expect(subject.time_taken).to be_nil }
       end
 
       context "with no end time" do
@@ -47,14 +43,14 @@ module Callgraph
     end
 
     context "when given a TracePoint event for a regular class" do
-      it { expect(subject.receiver_class).to eq(TestClass) }
-      it { expect(subject.method_string).to eq('Callgraph::TestClass#foo') }
-      it { expect(subject.method_type).to eq(:instance) }
-      it { expect(subject.defined_class_name).to eq('Callgraph::TestClass') }
-      it { expect(subject.defined_line_number).to eq(8) }
       it do
-        expect(Pathname.new(subject.defined_path).realdirpath).to(
-          eq(Pathname.new('spec/unit/callgraph/event_spec.rb').realdirpath)
+        is_expected.to have_attributes(
+          receiver_class: TestClass,
+          method_string: 'Callgraph::TestClass#foo',
+          method_type: :instance,
+          defined_class_name: 'Callgraph::TestClass',
+          defined_line_number: 8,
+          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
         )
       end
     end
@@ -69,14 +65,14 @@ module Callgraph
 
       let(:defined_class) { receiver.singleton_class }
 
-      it { expect(subject.receiver_class).to eq(TestClass) }
-      it { expect(subject.method_string).to eq('Callgraph::TestClass#foo (singleton)') }
-      it { expect(subject.method_type).to eq(:singleton) }
-      it { expect(subject.defined_class_name).to match(/#<Callgraph::TestClass:.*>/) }
-      it { expect(subject.defined_line_number).to eq(65) }
       it do
-        expect(Pathname.new(subject.defined_path).realdirpath).to(
-          eq(Pathname.new('spec/unit/callgraph/event_spec.rb').realdirpath)
+        is_expected.to have_attributes(
+          receiver_class: TestClass,
+          method_string: 'Callgraph::TestClass#foo (singleton)',
+          method_type: :singleton,
+          defined_class_name: a_string_matching(/#<Callgraph::TestClass:.*>/),
+          defined_line_number: 61,
+          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
         )
       end
     end
@@ -85,14 +81,14 @@ module Callgraph
       let(:receiver) { TestClass }
       let(:defined_class) { TestClass.singleton_class }
 
-      it { expect(subject.receiver_class).to eq(TestClass) }
-      it { expect(subject.method_string).to eq('Callgraph::TestClass.foo') }
-      it { expect(subject.method_type).to eq(:class) }
-      it { expect(subject.defined_class_name).to eq('Callgraph::TestClass') }
-      it { expect(subject.defined_line_number).to eq(5) }
       it do
-        expect(Pathname.new(subject.defined_path).realdirpath).to(
-          eq(Pathname.new('spec/unit/callgraph/event_spec.rb').realdirpath)
+        is_expected.to have_attributes(
+          receiver_class: TestClass,
+          method_string: 'Callgraph::TestClass.foo',
+          method_type: :class,
+          defined_class_name: 'Callgraph::TestClass',
+          defined_line_number: 5,
+          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
         )
       end
     end
