@@ -57,8 +57,8 @@ module Callgraph
 
     def method_type
       @method_type ||= begin
-        self_is_class = @tracepoint_event.self.class == Class
-        if @tracepoint_event.defined_class.singleton_class?
+        self_is_class = receiver.class == Class
+        if defined_class.singleton_class?
           self_is_class ? :class : :singleton
         elsif self_is_class
           :class
