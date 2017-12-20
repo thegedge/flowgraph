@@ -51,8 +51,8 @@ module Callgraph
           method_string: "Callgraph::TestClass#foo",
           method_type: :instance,
           defined_class_name: "Callgraph::TestClass",
-          defined_line_number: 8,
-          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
+          defined_line_number: 10,
+          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
         )
       end
     end
@@ -73,8 +73,8 @@ module Callgraph
           method_string: "Callgraph::TestClass#foo (singleton)",
           method_type: :singleton,
           defined_class_name: a_string_matching(/#<Callgraph::TestClass:.*>/),
-          defined_line_number: 61,
-          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
+          defined_line_number: 63,
+          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
         )
       end
     end
@@ -89,8 +89,8 @@ module Callgraph
           method_string: "Callgraph::TestClass.foo",
           method_type: :class,
           defined_class_name: "Callgraph::TestClass",
-          defined_line_number: 5,
-          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
+          defined_line_number: 7,
+          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
         )
       end
     end
