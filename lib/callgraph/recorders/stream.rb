@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Callgraph
   module Recorders
     class Stream < Recorder
@@ -10,7 +12,7 @@ module Callgraph
         case event.type
         when :call
           @stream.write("  " * @stack_depth)
-          @stream.write("#{event.method_string}")
+          @stream.write(event.method_string)
           @stream.write("\n")
           @stack_depth += 1
         else

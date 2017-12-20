@@ -1,0 +1,35 @@
+AllCops:
+  TargetRubyVersion: 2.4
+
+Rails:
+  Enabled: false
+
+Style/Documentation:
+  Exclude:
+    - 'examples/*'
+    - 'spec/**/*'
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/BlockLength:
+  ExcludedMethods:
+    - describe
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 25
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Lint/EndAlignment:
+  EnforcedStyleAlignWith: variable

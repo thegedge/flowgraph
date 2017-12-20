@@ -1,5 +1,7 @@
-require 'callgraph'
-require 'benchmark'
+# frozen_string_literal: true
+
+require "callgraph"
+require "benchmark"
 
 class A
   def initialize

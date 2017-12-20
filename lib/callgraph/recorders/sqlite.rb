@@ -1,4 +1,6 @@
-require 'sqlite3'
+# frozen_string_literal: true
+
+require "sqlite3"
 
 module Callgraph
   module Recorders
@@ -9,16 +11,16 @@ module Callgraph
       end
 
       def record(event)
-        if event.type == :call
-          @stack << store_event(event)
-          if event.parent
-            database.execute(
-              "INSERT OR IGNORE INTO method_calls(source, target) VALUES(?, ?)",
-              @stack[-2],
-              @stack[-1]
-            )
-          end
-        end
+        return unless event.type == :call
+
+        @stack << store_event(event)
+        return unless event.parent
+
+        database.execute(
+          "INSERT OR IGNORE INTO method_calls(source, target) VALUES(?, ?)",
+          @stack[-2],
+          @stack[-1]
+        )
       end
 
       private

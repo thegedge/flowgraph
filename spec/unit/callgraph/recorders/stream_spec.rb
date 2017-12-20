@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 module Callgraph
@@ -23,10 +25,10 @@ module Callgraph
           subject.record(call_event_b)
 
           expect(stream.string).to eq(
-            <<~EOS
+            <<~CALL_GRAPH
               Test.foo
               MyCoolClass#foo
-            EOS
+            CALL_GRAPH
           )
         end
 
@@ -43,14 +45,14 @@ module Callgraph
           subject.record(call_event_a)
 
           expect(stream.string).to eq(
-            <<~EOS
+            <<~CALL_GRAPH
               Test.foo
                 MyCoolClass#foo
                   Test.foo
                 Test.foo
               MyCoolClass#foo
                 Test.foo
-            EOS
+            CALL_GRAPH
           )
         end
       end

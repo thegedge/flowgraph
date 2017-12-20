@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "callgraph/event"
 require "callgraph/recorder"
 require "callgraph/recorders/sqlite"
@@ -6,9 +8,9 @@ require "callgraph/tracer"
 require "callgraph/version"
 
 module Callgraph
-  extend self
-
-  def record(recorder)
-    Callgraph::Tracer.new(recorder).trace { yield }
+  class << self
+    def record(recorder)
+      Callgraph::Tracer.new(recorder).trace { yield }
+    end
   end
 end

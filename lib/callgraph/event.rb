@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Callgraph
   class Event
     extend Forwardable

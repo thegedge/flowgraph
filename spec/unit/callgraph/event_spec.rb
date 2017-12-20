@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 module Callgraph
@@ -11,7 +13,7 @@ module Callgraph
 
   RSpec.describe(Event) do
     let(:parent) { nil }
-    let(:start_time) { Time.parse('2017-12-12 00:00:00.000 UTC') }
+    let(:start_time) { Time.parse("2017-12-12 00:00:00.000 UTC") }
     let(:end_time) { start_time ? start_time + Rational(33, 32) : nil }
 
     let(:defined_class) { TestClass }
@@ -24,7 +26,7 @@ module Callgraph
 
     subject { Event.new(tp_event, start_time: start_time, end_time: end_time, parent: parent) }
 
-    context '#time_taken' do
+    context "#time_taken" do
       context "when given a start and end time" do
         it { expect(subject.time_taken).to be_within(1e-10).of(1.03125) }
       end
@@ -46,11 +48,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: 'Callgraph::TestClass#foo',
+          method_string: "Callgraph::TestClass#foo",
           method_type: :instance,
-          defined_class_name: 'Callgraph::TestClass',
+          defined_class_name: "Callgraph::TestClass",
           defined_line_number: 8,
-          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
+          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
         )
       end
     end
@@ -68,11 +70,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: 'Callgraph::TestClass#foo (singleton)',
+          method_string: "Callgraph::TestClass#foo (singleton)",
           method_type: :singleton,
           defined_class_name: a_string_matching(/#<Callgraph::TestClass:.*>/),
           defined_line_number: 61,
-          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
+          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
         )
       end
     end
@@ -84,11 +86,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: 'Callgraph::TestClass.foo',
+          method_string: "Callgraph::TestClass.foo",
           method_type: :class,
-          defined_class_name: 'Callgraph::TestClass',
+          defined_class_name: "Callgraph::TestClass",
           defined_line_number: 5,
-          defined_path: a_string_ending_with('spec/unit/callgraph/event_spec.rb')
+          defined_path: a_string_ending_with("spec/unit/callgraph/event_spec.rb")
         )
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "callgraph"
 
@@ -22,7 +24,7 @@ RSpec.configure do |config|
 
   config.fail_fast = 5
   config.warnings = true
-  config.default_formatter = 'doc' if config.files_to_run.one?
+  config.default_formatter = "doc" if config.files_to_run.one?
 
   config.order = :random
   Kernel.srand config.seed
