@@ -29,3 +29,8 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand config.seed
 end
+
+sqlite_recorder = Callgraph::Recorders::Sqlite.new("tmp/callgraph_tests", include_entrypoints: false)
+recorder = Callgraph::Recorders::Filtered.exclude_system(sqlite_recorder)
+
+Callgraph::Hooks.install_rspec_hooks(recorder)

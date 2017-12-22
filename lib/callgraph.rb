@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "callgraph/event"
+require "callgraph/hooks"
 require "callgraph/recorder"
 require "callgraph/recorders/filtered"
 require "callgraph/recorders/sqlite"
