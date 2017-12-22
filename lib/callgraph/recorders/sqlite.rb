@@ -11,8 +11,9 @@ module Callgraph
       Method = Struct.new("Method", :name, :class, :path, :line_number, :type)
       MethodCall = Struct.new("MethodCall", :source, :target)
 
-      def initialize(db_path)
+      def initialize(db_path, include_entrypoints: true)
         @db_path = db_path
+        @include_entrypoints = include_entrypoints
         @stack = []
       end
 
@@ -23,12 +24,12 @@ module Callgraph
         end
 
         @stack << store_event(event)
-        return if @stack.length <= 1
+        return unless @include_entrypoints || @stack.length > 1
 
         database.execute(
-          "INSERT OR IGNORE INTO #{METHOD_CALLS_TABLE}(source, target) VALUES(?, ?)",
+          "INSERT OR REPLACE INTO #{METHOD_CALLS_TABLE}(source, target) VALUES(?, ?)",
           [
-            @stack[-2],
+            @stack[-2] || -1,
             @stack[-1],
           ]
         )
@@ -36,8 +37,8 @@ module Callgraph
 
       def database
         @database ||= SQLite3::Database.new(@db_path).tap do |db|
-          db.execute_batch("
-            CREATE TABLE IF NOT EXISTS #{METHODS_TABLE} (
+          db.execute_batch(
+            "CREATE TABLE IF NOT EXISTS #{METHODS_TABLE} (
               id integer PRIMARY KEY AUTOINCREMENT,
               name varchar(255),
               class varchar(255),
@@ -56,8 +57,8 @@ module Callgraph
               PRIMARY KEY(source, target),
               FOREIGN KEY(source) REFERENCES #{METHODS_TABLE}(id),
               FOREIGN KEY(target) REFERENCES #{METHODS_TABLE}(id)
-            );
-          ")
+            );"
+          )
         end
       end
 
@@ -73,7 +74,10 @@ module Callgraph
 
         method_instances = methods
         database.execute("SELECT source, target FROM #{METHOD_CALLS_TABLE}").each do |source, target|
-          yield MethodCall.new(method_instances[source], method_instances[target])
+          yield MethodCall.new(
+            source == -1 ? nil : method_instances[source],
+            method_instances[target]
+          )
         end
       end
 
