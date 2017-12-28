@@ -8,7 +8,6 @@ module Callgraph
           new(child_recorder) do |event|
             next false if event.defined_path.include?(".gem")
             next false if event.defined_path.start_with?("/opt")
-            next false if event.defined_path.include?("/spec/")
             true
           end
         end

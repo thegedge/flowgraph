@@ -15,11 +15,12 @@ module Callgraph
 
     attr_reader :type, :method_name, :receiver, :defined_class
 
-    def initialize(type:, method_name:, receiver:, defined_class:)
+    def initialize(type:, method_name:, receiver:, defined_class:, source_location: nil)
       @type = type
       @method_name = method_name
       @receiver = receiver
       @defined_class = defined_class
+      @source_location = source_location || defined_class.instance_method(method_name).source_location
     end
 
     def receiver_class
@@ -38,11 +39,11 @@ module Callgraph
     end
 
     def defined_path
-      source_location[0]
+      @source_location[0]
     end
 
     def defined_line_number
-      source_location[1]
+      @source_location[1]
     end
 
     def method_string
@@ -67,12 +68,6 @@ module Callgraph
           :instance
         end
       end
-    end
-
-    private
-
-    def source_location
-      @source_location ||= defined_class.instance_method(method_name).source_location
     end
   end
 end
