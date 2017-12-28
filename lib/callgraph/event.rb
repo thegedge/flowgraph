@@ -9,18 +9,8 @@ module Callgraph
     def_delegator :@tracepoint_event, :self, :receiver
     def_delegator :@tracepoint_event, :defined_class
 
-    attr_reader :parent, :start_time, :end_time
-
-    def initialize(tracepoint_event, parent: nil, start_time: nil, end_time: nil)
+    def initialize(tracepoint_event)
       @tracepoint_event = tracepoint_event
-      @parent = parent
-      @start_time = start_time
-      @end_time = end_time
-    end
-
-    def time_taken
-      return nil unless start_time && end_time
-      end_time - start_time
     end
 
     def receiver_class

@@ -6,8 +6,8 @@ module Callgraph
       def install_rspec_hooks(recorder)
         tracer = Tracer.new(recorder)
         RSpec.configure do |config|
-          config.around(:each) do |example|
-            tracer.trace { example.run }
+          config.around(:each) do |procsy|
+            tracer.trace { procsy.run }
           end
         end
       end
