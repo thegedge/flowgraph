@@ -2,15 +2,24 @@
 
 module Callgraph
   class Event
-    extend Forwardable
+    class << self
+      def from_tracepoint_event(event)
+        new(
+          type: event.event,
+          method_name: event.method_id,
+          receiver: event.self,
+          defined_class: event.defined_class
+        )
+      end
+    end
 
-    def_delegator :@tracepoint_event, :event, :type
-    def_delegator :@tracepoint_event, :method_id, :method_name
-    def_delegator :@tracepoint_event, :self, :receiver
-    def_delegator :@tracepoint_event, :defined_class
+    attr_reader :type, :method_name, :receiver, :defined_class
 
-    def initialize(tracepoint_event)
-      @tracepoint_event = tracepoint_event
+    def initialize(type:, method_name:, receiver:, defined_class:)
+      @type = type
+      @method_name = method_name
+      @receiver = receiver
+      @defined_class = defined_class
     end
 
     def receiver_class

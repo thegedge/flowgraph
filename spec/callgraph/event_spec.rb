@@ -20,7 +20,7 @@ module Callgraph
       instance_double(TracePoint, defined_class: defined_class, event: event, method_id: method_name, self: receiver)
     end
 
-    subject { Event.new(tp_event) }
+    subject { Event.from_tracepoint_event(tp_event) }
 
     context "when given a TracePoint event for a regular class" do
       it do
