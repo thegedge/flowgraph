@@ -5,7 +5,7 @@ module Callgraph
     def initialize(recorder)
       @recorder = recorder
       @tracer = TracePoint.new(:call, :return) do |event|
-        @recorder.record(Event.from_tracepoint_event(event))
+        @recorder.record(TracepointEvent.new(event))
       end
     end
 

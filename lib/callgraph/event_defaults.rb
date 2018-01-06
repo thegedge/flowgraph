@@ -1,28 +1,7 @@
 # frozen_string_literal: true
 
 module Callgraph
-  class Event
-    class << self
-      def from_tracepoint_event(event)
-        new(
-          type: event.event,
-          method_name: event.method_id,
-          receiver: event.self,
-          defined_class: event.defined_class
-        )
-      end
-    end
-
-    attr_reader :type, :method_name, :receiver, :defined_class
-
-    def initialize(type:, method_name:, receiver:, defined_class:, source_location: nil)
-      @type = type
-      @method_name = method_name
-      @receiver = receiver
-      @defined_class = defined_class
-      @source_location = source_location || defined_class.instance_method(method_name).source_location
-    end
-
+  module EventDefaults
     def receiver_class
       method_type == :class ? receiver : receiver.class
     end
@@ -39,11 +18,11 @@ module Callgraph
     end
 
     def defined_path
-      @source_location[0]
+      source_location[0]
     end
 
     def defined_line_number
-      @source_location[1]
+      source_location[1]
     end
 
     def method_string
@@ -68,6 +47,10 @@ module Callgraph
           :instance
         end
       end
+    end
+
+    def source_location
+      @source_location ||= defined_class.instance_method(method_name).source_location
     end
   end
 end

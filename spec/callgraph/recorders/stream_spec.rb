@@ -6,9 +6,9 @@ module Callgraph
   module Recorders
     RSpec.describe(Stream) do
       let(:stream) { StringIO.new }
-      let(:call_event_a) { instance_double(Event, type: :call, method_string: "Test.foo") }
-      let(:call_event_b) { instance_double(Event, type: :call, method_string: "MyCoolClass#foo") }
-      let(:return_event) { instance_double(Event, type: :return) }
+      let(:call_event_a) { instance_double(TracepointEvent, type: :call, method_string: "Test.foo") }
+      let(:call_event_b) { instance_double(TracepointEvent, type: :call, method_string: "MyCoolClass#foo") }
+      let(:return_event) { instance_double(TracepointEvent, type: :return) }
 
       subject { Stream.new(stream) }
 

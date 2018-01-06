@@ -48,5 +48,5 @@ Callgraph.record(recorder) do
   b.bar
 end
 
-puts
-Callgraph.record(recorder) { C.new.bar }
+#puts
+#Callgraph.record(recorder) { C.new.bar }

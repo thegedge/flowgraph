@@ -10,7 +10,7 @@ module Callgraph
       # TODO have a shared pool of instance doubles for recorder specs
       let(:call_event_a) do
         instance_double(
-          Event,
+          TracepointEvent,
           type: :call,
           method_name: "foo",
           defined_class_name: "Test",
@@ -24,7 +24,7 @@ module Callgraph
 
       let(:call_event_b) do
         instance_double(
-          Event,
+          TracepointEvent,
           type: :call,
           method_name: "foo",
           defined_class_name: "MyCoolClass",
@@ -38,7 +38,7 @@ module Callgraph
         Sqlite::Method.new("foo", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
       end
 
-      let(:return_event) { instance_double(Event, type: :return) }
+      let(:return_event) { instance_double(TracepointEvent, type: :return) }
 
       before(:each) { subject.database.transaction }
       after(:each) { subject.database.rollback }

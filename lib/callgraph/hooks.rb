@@ -13,27 +13,9 @@ module Callgraph
             defined_class = procsy.example.class
             source_location = procsy.example.location.split(":")
 
-            tracer.inject_event(
-              Event.new(
-                type: :call,
-                method_name: method_name,
-                receiver: receiver,
-                defined_class: defined_class,
-                source_location: source_location
-              )
-            )
-
+            tracer.inject_event(RSpecExampleEvent.new(procsy.example, :call))
             tracer.trace { procsy.run }
-
-            tracer.inject_event(
-              Event.new(
-                type: :return,
-                method_name: method_name,
-                receiver: receiver,
-                defined_class: defined_class,
-                source_location: source_location
-              )
-            )
+            tracer.inject_event(RSpecExampleEvent.new(procsy.example, :return))
           end
         end
       end

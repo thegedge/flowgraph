@@ -11,7 +11,7 @@ module Callgraph
     end
   end
 
-  RSpec.describe(Event) do
+  RSpec.describe(TracepointEvent) do
     let(:defined_class) { TestClass }
     let(:receiver) { defined_class.new }
     let(:event) { :call }
@@ -20,7 +20,7 @@ module Callgraph
       instance_double(TracePoint, defined_class: defined_class, event: event, method_id: method_name, self: receiver)
     end
 
-    subject { Event.from_tracepoint_event(tp_event) }
+    subject { TracepointEvent.new(tp_event) }
 
     context "when given a TracePoint event for a regular class" do
       it do
@@ -30,7 +30,7 @@ module Callgraph
           method_type: :instance,
           defined_class_name: "Callgraph::TestClass",
           defined_line_number: 10,
-          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
+          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
         )
       end
     end
@@ -52,7 +52,7 @@ module Callgraph
           method_type: :singleton,
           defined_class_name: a_string_matching(/#<Callgraph::TestClass:.*>/),
           defined_line_number: 41,
-          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
+          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
         )
       end
     end
@@ -68,7 +68,7 @@ module Callgraph
           method_type: :class,
           defined_class_name: "Callgraph::TestClass",
           defined_line_number: 7,
-          defined_path: a_string_ending_with("spec/callgraph/event_spec.rb")
+          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
         )
       end
     end
