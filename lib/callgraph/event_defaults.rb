@@ -3,12 +3,17 @@
 module Callgraph
   module EventDefaults
     def receiver_class
-      method_type == :class ? receiver : receiver.class
+      case method_type
+      when :class, :module
+        receiver
+      else
+        receiver.class
+      end
     end
 
     def defined_class_name
       @defined_class_name ||= case method_type
-      when :class
+      when :class, :module
         receiver_class.to_s
       when :singleton
         defined_class.to_s.match(/#<Class:(.*)>/).captures[0]
@@ -27,7 +32,7 @@ module Callgraph
 
     def method_string
       @method_string ||= case method_type
-      when :class
+      when :class, :module
         "#{receiver_class}.#{method_name}"
       when :singleton
         "#{receiver_class}##{method_name} (singleton)"
@@ -38,11 +43,12 @@ module Callgraph
 
     def method_type
       @method_type ||= begin
-        self_is_class = receiver.class == Class
-        if defined_class.singleton_class?
-          self_is_class ? :class : :singleton
-        elsif self_is_class
+        if receiver.class == Class
           :class
+        elsif receiver.class == Module
+          :module
+        elsif defined_class.singleton_class?
+          :singleton
         else
           :instance
         end

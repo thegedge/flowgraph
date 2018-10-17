@@ -8,3 +8,4 @@
 /tmp/
 *.sqlite3
 *.db
+.ruby-version
