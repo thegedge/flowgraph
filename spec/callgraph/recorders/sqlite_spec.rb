@@ -4,9 +4,9 @@ require "spec_helper"
 
 module Callgraph
   module Recorders
-    RSpec.describe(Sqlite) do
-      let(:db_path) { "tmp/sqlite_test" }
+    DB_PATH = "tmp/sqlite_test"
 
+    RSpec.describe(Sqlite) do
       # TODO have a shared pool of instance doubles for recorder specs
       let(:call_event_a) do
         instance_double(
@@ -43,98 +43,46 @@ module Callgraph
       before(:each) { subject.database.transaction }
       after(:each) { subject.database.rollback }
 
-      context "initialized with include_entrypoints: true" do
-        describe "#record" do
-          subject { Sqlite.new(db_path, include_entrypoints: true) }
+      describe "#record" do
+        subject { Sqlite.new(DB_PATH) }
 
-          it "writes a single event" do
-            subject.record(call_event_a)
+        it "writes a single event" do
+          subject.record(call_event_a)
 
-            expect(subject.methods.values).to eq([method_a])
-            expect(subject.method_calls.to_a).to contain_exactly(
-              Sqlite::MethodCall.new(nil, method_a)
-            )
-          end
-
-          it "writes multiple events" do
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(call_event_b)
-
-            expect(subject.methods.values).to eq([method_a, method_b])
-            expect(subject.method_calls.to_a).to contain_exactly(
-              Sqlite::MethodCall.new(nil, method_a),
-              Sqlite::MethodCall.new(nil, method_b)
-            )
-          end
-
-          it "writes hierarchical events" do
-            subject.record(call_event_a)
-            subject.record(call_event_b)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(return_event)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(return_event)
-            subject.record(call_event_b)
-            subject.record(call_event_a)
-
-            expect(subject.methods.values).to eq([method_a, method_b])
-            expect(subject.method_calls.to_a).to contain_exactly(
-              Sqlite::MethodCall.new(nil, method_a),
-              Sqlite::MethodCall.new(nil, method_b),
-              Sqlite::MethodCall.new(method_a, method_b),
-              Sqlite::MethodCall.new(method_b, method_a),
-              Sqlite::MethodCall.new(method_a, method_a)
-            )
-          end
+          expect(subject.methods.values).to eq([method_a])
+          expect(subject.method_calls.to_a).to be_empty
         end
-      end
 
-      context "initialized with include_entrypoints: false"
-        describe "#record" do
-          subject { Sqlite.new(db_path, include_entrypoints: false) }
+        it "writes multiple events" do
+          subject.record(call_event_a)
+          subject.record(return_event)
+          subject.record(call_event_a)
+          subject.record(return_event)
+          subject.record(call_event_b)
 
-          it "writes a single event" do
-            subject.record(call_event_a)
+          expect(subject.methods.values).to eq([method_a, method_b])
+          expect(subject.method_calls.to_a).to be_empty
+        end
 
-            expect(subject.methods.values).to eq([method_a])
-            expect(subject.method_calls.to_a).to be_empty
-          end
+        it "writes hierarchical events" do
+          subject.record(call_event_a)
+          subject.record(call_event_b)
+          subject.record(call_event_a)
+          subject.record(return_event)
+          subject.record(return_event)
+          subject.record(call_event_b)
+          subject.record(return_event)
+          subject.record(return_event)
+          subject.record(call_event_b)
+          subject.record(call_event_a)
 
-          it "writes multiple events" do
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(call_event_b)
-
-            expect(subject.methods.values).to eq([method_a, method_b])
-            expect(subject.method_calls.to_a).to be_empty
-          end
-
-          it "writes hierarchical events" do
-            subject.record(call_event_a)
-            subject.record(call_event_b)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(return_event)
-            subject.record(call_event_a)
-            subject.record(return_event)
-            subject.record(return_event)
-            subject.record(call_event_b)
-            subject.record(call_event_a)
-
-            expect(subject.methods.values).to eq([method_a, method_b])
-            expect(subject.method_calls.to_a).to contain_exactly(
-              Sqlite::MethodCall.new(method_a, method_b),
-              Sqlite::MethodCall.new(method_b, method_a),
-              Sqlite::MethodCall.new(method_a, method_a)
-            )
-          end
+          expect(subject.methods.values).to eq([method_a, method_b])
+          expect(subject.method_calls.to_a).to contain_exactly(
+            Sqlite::MethodCall.new(method_a, method_b, 0),
+            Sqlite::MethodCall.new(method_b, method_a, 0),
+            Sqlite::MethodCall.new(method_a, method_a, 1)
+          )
+        end
       end
     end
   end

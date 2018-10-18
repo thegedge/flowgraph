@@ -11,9 +11,10 @@ module Callgraph
       Method = Struct.new("Method", :name, :class, :path, :line_number, :type)
       MethodCall = Struct.new("MethodCall", :source, :target)
 
-      def initialize(db_path, include_entrypoints: true)
+      MethodCall = Struct.new("MethodCall", :source, :target, :transitive)
+
+      def initialize(db_path)
         @db_path = db_path
-        @include_entrypoints = include_entrypoints
         @stack = []
       end
 
@@ -24,15 +25,21 @@ module Callgraph
         end
 
         @stack << store_event(event)
-        return unless @include_entrypoints || @stack.length > 1
+        return unless @stack.length > 1
 
-        database.execute(
-          "INSERT OR REPLACE INTO #{METHOD_CALLS_TABLE}(source, target) VALUES(?, ?)",
-          [
-            @stack[-2] || -1,
-            @stack[-1],
-          ]
-        )
+        @stack.reverse.drop(1).each_with_index do |source, index|
+          # Ignore if part of the transitive closure
+          replace_op = (index == 0 ? "REPLACE" : "IGNORE")
+
+          database.execute(
+            "INSERT OR #{replace_op} INTO #{METHOD_CALLS_TABLE}(source, target, transitive) VALUES(?, ?, ?)",
+            [
+              source,
+              @stack.last,
+              index == 0 ? 0 : 1,
+            ]
+          )
+        end
       end
 
       def database
@@ -53,6 +60,7 @@ module Callgraph
             CREATE TABLE IF NOT EXISTS #{METHOD_CALLS_TABLE} (
               source integer,
               target integer,
+              transitive boolean,
 
               PRIMARY KEY(source, target),
               FOREIGN KEY(source) REFERENCES #{METHODS_TABLE}(id),
@@ -73,10 +81,11 @@ module Callgraph
         return enum_for(:method_calls) unless block_given?
 
         method_instances = methods
-        database.execute("SELECT source, target FROM #{METHOD_CALLS_TABLE}").each do |source, target|
+        database.execute("SELECT transitive, source, target FROM #{METHOD_CALLS_TABLE}").each do |transitive, source, target|
           yield MethodCall.new(
             source == -1 ? nil : method_instances[source],
-            method_instances[target]
+            method_instances[target],
+            transitive,
           )
         end
       end
