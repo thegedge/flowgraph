@@ -78,9 +78,9 @@ module Callgraph
 
           expect(subject.methods.values).to eq([method_a, method_b])
           expect(subject.method_calls.to_a).to contain_exactly(
-            Sqlite::MethodCall.new(method_a, method_b, 0),
-            Sqlite::MethodCall.new(method_b, method_a, 0),
-            Sqlite::MethodCall.new(method_a, method_a, 1)
+            Sqlite::MethodCall.new(method_a, method_b, false),
+            Sqlite::MethodCall.new(method_b, method_a, false),
+            Sqlite::MethodCall.new(method_a, method_a, true)
           )
         end
       end

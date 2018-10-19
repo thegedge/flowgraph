@@ -8,8 +8,17 @@ module Callgraph
       METHODS_TABLE = "methods"
       METHOD_CALLS_TABLE = "method_calls"
 
-      Method = Struct.new("Method", :name, :class, :path, :line_number, :type)
-      MethodCall = Struct.new("MethodCall", :source, :target)
+      _Method = Struct.new("Method", :name, :class, :path, :line_number, :type)
+      class Method < _Method
+        def to_s
+          case type
+          when :module, :class
+            "#{self.class}.#{name}"
+          else
+            "#{self.class}##{name}"
+          end
+        end
+      end
 
       MethodCall = Struct.new("MethodCall", :source, :target, :transitive)
 
@@ -85,7 +94,7 @@ module Callgraph
           yield MethodCall.new(
             source == -1 ? nil : method_instances[source],
             method_instances[target],
-            transitive,
+            transitive != 0,
           )
         end
       end
