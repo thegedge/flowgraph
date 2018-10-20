@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 require "sqlite3"
 
 module Callgraph
@@ -24,7 +23,7 @@ module Callgraph
 
       def initialize(db_path)
         @db_path = db_path
-        @stack = []
+        @stack = Stack.new("sqlite")
       end
 
       def record(event)
