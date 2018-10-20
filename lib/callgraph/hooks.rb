@@ -26,6 +26,7 @@ module Callgraph
         Recorders::Filtered.new(recorder) do |event|
           next true if event.defined_class == RSpec::Core::Example
           next false if event.defined_class.to_s.start_with?('RSpec::')
+          next false if event.defined_path.include?("/spec/")
           true
         end
       end
