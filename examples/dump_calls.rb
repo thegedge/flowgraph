@@ -3,6 +3,7 @@ require "callgraph"
 require "optparse"
 
 options = {
+  cluster: false,
   preview: false,
   transitive: false,
   filter: [],
@@ -13,6 +14,10 @@ OptionParser.new do |opts|
 
   opts.on("-p", "--preview", "Output PNG and open") do |_|
     options[:preview] = true
+  end
+
+  opts.on("-c", "--cluster", "Cluster calls with their receiving class") do |v|
+    options[:cluster] = true
   end
 
   opts.on("-t", "--transitive", String, "Draw edges for the transitive closure") do |v|
@@ -30,10 +35,34 @@ OptionParser.new do |opts|
 end.parse!
 
 File.open("callgraph.dot", "wt") do |f|
-  f.write("digraph callgraph {")
+  f.write("strict digraph callgraph {\n")
+  f.write("  node[fontname=\"Source Code Pro\"]\n")
+  f.write("  fontname=\"Source Code Pro bold\"\n")
 
   recorder = Callgraph::Recorders::Sqlite.new(ARGV[0])
-  recorder.method_calls.each do |mc|
+  method_calls = recorder.method_calls
+
+  # Cluster the classes together
+  if options[:cluster]
+    class_methods = method_calls.each_with_object({}) do |mc, classes|
+      [mc.source, mc.target].each do |method|
+        classes[method.receiver_class] ||= Set.new
+        classes[method.receiver_class] << method.to_s
+      end
+    end
+
+    class_methods.each_with_index do |(clazz, methods), index|
+      f.write("  subgraph cluster_#{index} {\n")
+      f.write("    label = \"#{clazz}\";\n")
+      methods.each do |method|
+        f.write("    \"#{method}\";\n")
+      end
+      f.write("  }\n\n")
+    end
+  end
+
+  # Now the edges
+  method_calls.each do |mc|
     next if options[:filter].include?(mc.source.class)
     next if mc.transitive && !options[:transitive]
 
