@@ -1,14 +1,14 @@
 # frozen_string_literal: true
+require 'pathname'
 
 module Callgraph
   module Recorders
     class Filtered < Recorder
       class << self
-        def exclude_system(child_recorder)
+        def only(child_recorder, root)
+          glob = File.join(File.expand_path(root), "**")
           new(child_recorder) do |event|
-            next false if event.defined_path.include?(".gem")
-            next false if event.defined_path.start_with?("/opt")
-            true
+            File.fnmatch?(glob, event.defined_path)
           end
         end
       end

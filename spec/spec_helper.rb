@@ -31,6 +31,6 @@ RSpec.configure do |config|
 end
 
 sqlite_recorder = Callgraph::Recorders::Sqlite.new("tmp/callgraph_tests")
-recorder = Callgraph::Recorders::Filtered.exclude_system(sqlite_recorder)
+recorder = Callgraph::Recorders::Filtered.only(sqlite_recorder, File.join(__dir__, ".."))
 
 Callgraph::Hooks.install_rspec_hooks(recorder)
