@@ -63,7 +63,7 @@ File.open("callgraph.dot", "wt") do |f|
 
   # Now the edges
   method_calls.each do |mc|
-    next if options[:filter].include?(mc.source.class)
+    next if options[:filter].include?(mc.source.receiver_class)
     next if mc.transitive && !options[:transitive]
 
     f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
