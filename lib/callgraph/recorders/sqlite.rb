@@ -7,14 +7,20 @@ module Callgraph
       METHODS_TABLE = "methods"
       METHOD_CALLS_TABLE = "method_calls"
 
-      _Method = Struct.new("Method", :name, :class, :path, :line_number, :type)
+      _Method = Struct.new("Method", :name, :receiver_class, :defined_class, :path, :line_number, :type)
       class Method < _Method
+        def initialize(name, receiver_class, defined_class, path, line_number, type)
+          super(name, receiver_class, defined_class, path, line_number.to_i, type.to_sym)
+        end
+
         def to_s
           case type
           when :module, :class
-            "#{self.class}.#{name}"
+            "#{receiver_class}.#{name}"
+          when :singleton
+            "#{receiver_class}##{name} (singleton)"
           else
-            "#{self.class}##{name}"
+            "#{receiver_class}##{name}"
           end
         end
       end
@@ -40,7 +46,7 @@ module Callgraph
           replace_op = (index == 0 ? "REPLACE" : "IGNORE")
 
           database.execute(
-            "INSERT OR #{replace_op} INTO #{METHOD_CALLS_TABLE}(source, target, transitive) VALUES(?, ?, ?)",
+            "INSERT OR #{replace_op} INTO #{METHOD_CALLS_TABLE}(source_id, target_id, transitive) VALUES(?, ?, ?)",
             [
               source,
               @stack.last,
@@ -56,32 +62,35 @@ module Callgraph
             "CREATE TABLE IF NOT EXISTS #{METHODS_TABLE} (
               id integer PRIMARY KEY AUTOINCREMENT,
               name varchar(255),
-              class varchar(255),
+              receiver_class varchar(255),
+              defined_class varchar(255),
               path varchar(255),
               line_number integer,
               type varchar(32)
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS unique_method ON #{METHODS_TABLE}(name, class, path, line_number, type);
+            CREATE UNIQUE INDEX IF NOT EXISTS unique_method
+              ON #{METHODS_TABLE}(name, receiver_class, defined_class, path, line_number, type);
+
             CREATE INDEX IF NOT EXISTS name ON #{METHODS_TABLE}(name);
 
             CREATE TABLE IF NOT EXISTS #{METHOD_CALLS_TABLE} (
-              source integer,
-              target integer,
+              source_id integer,
+              target_id integer,
               transitive boolean,
 
-              PRIMARY KEY(source, target),
-              FOREIGN KEY(source) REFERENCES #{METHODS_TABLE}(id),
-              FOREIGN KEY(target) REFERENCES #{METHODS_TABLE}(id)
+              PRIMARY KEY(source_id, target_id),
+              FOREIGN KEY(source_id) REFERENCES #{METHODS_TABLE}(id),
+              FOREIGN KEY(target_id) REFERENCES #{METHODS_TABLE}(id)
             );"
           )
         end
       end
 
       def methods
-        rows = database.execute("SELECT id, name, class, path, line_number, type FROM #{METHODS_TABLE}")
-        rows.each_with_object({}) do |(id, name, clazz, path, line_number, type), h|
-          h[id] = Method.new(name, clazz, path, line_number.to_i, type.to_sym)
+        rows = database.execute("SELECT id, #{Method.members.join(", ")} FROM #{METHODS_TABLE}")
+        rows.each_with_object({}) do |(id, *members), h|
+          h[id] = Method.new(*members)
         end
       end
 
@@ -89,10 +98,12 @@ module Callgraph
         return enum_for(:method_calls) unless block_given?
 
         method_instances = methods
-        database.execute("SELECT transitive, source, target FROM #{METHOD_CALLS_TABLE}").each do |transitive, source, target|
+
+        query = "SELECT transitive, source_id, target_id FROM #{METHOD_CALLS_TABLE}"
+        database.execute(query).each do |transitive, source_id, target_id|
           yield MethodCall.new(
-            source == -1 ? nil : method_instances[source],
-            method_instances[target],
+            source_id == -1 ? nil : method_instances[source_id],
+            method_instances[target_id],
             transitive != 0,
           )
         end
@@ -102,9 +113,11 @@ module Callgraph
 
       def store_event(event)
         database.execute(
-          "INSERT INTO #{METHODS_TABLE}(name, class, path, line_number, type) VALUES(?, ?, ?, ?, ?)",
+          "INSERT INTO #{METHODS_TABLE}(name, receiver_class, defined_class, path, line_number, type)" \
+          "  VALUES(?, ?, ?, ?, ?, ?)",
           [
             event.method_name.to_s,
+            event.receiver_class_name,
             event.defined_class_name,
             event.defined_path,
             event.defined_line_number,
@@ -112,11 +125,14 @@ module Callgraph
           ]
         )
         database.last_insert_row_id
-      rescue SQLite3::ConstraintException
+      rescue SQLite3::ConstraintException => e
         database.get_first_value(
-          "SELECT id FROM #{METHODS_TABLE} WHERE name=? AND class=? AND path=? AND line_number=? AND type=?",
+          "SELECT id" \
+          "  FROM #{METHODS_TABLE}" \
+          "  WHERE name=? AND receiver_class=? AND defined_class=? AND path=? AND line_number=? AND type=?",
           [
             event.method_name.to_s,
+            event.receiver_class_name,
             event.defined_class_name,
             event.defined_path,
             event.defined_line_number,

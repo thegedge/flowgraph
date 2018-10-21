@@ -13,6 +13,7 @@ module Callgraph
           TracepointEvent,
           type: :call,
           method_name: "foo",
+          receiver_class_name: "Foo",
           defined_class_name: "Test",
           defined_path: "spec/callgraph/recorders/sqlite_spec.rb",
           defined_line_number: 5,
@@ -20,13 +21,14 @@ module Callgraph
         )
       end
 
-      let(:method_a) { Sqlite::Method.new("foo", "Test", "spec/callgraph/recorders/sqlite_spec.rb", 5, :class) }
+      let(:method_a) { Sqlite::Method.new("foo", "Foo", "Test", "spec/callgraph/recorders/sqlite_spec.rb", 5, :class) }
 
       let(:call_event_b) do
         instance_double(
           TracepointEvent,
           type: :call,
           method_name: "foo",
+          receiver_class_name: "Bar",
           defined_class_name: "MyCoolClass",
           defined_path: "spec/callgraph/recorders/sqlite_spec.rb",
           defined_line_number: 13,
@@ -35,7 +37,7 @@ module Callgraph
       end
 
       let(:method_b) do
-        Sqlite::Method.new("foo", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
+        Sqlite::Method.new("foo", "Bar", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
       end
 
       let(:return_event) { instance_double(TracepointEvent, type: :return) }

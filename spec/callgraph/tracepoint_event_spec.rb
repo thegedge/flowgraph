@@ -55,7 +55,7 @@ module Callgraph
           receiver_class: TestClass,
           method_string: "Callgraph::TestClass#foo (singleton)",
           method_type: :singleton,
-          defined_class_name: a_string_matching(/#<Callgraph::TestClass:.*>/),
+          defined_class_name: "Callgraph::TestClass",
           defined_line_number: receiver.method(:foo).source_location.last,
           defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
         )

@@ -3,7 +3,7 @@
 module Callgraph
   module EventDefaults
     def receiver_class
-      case method_type
+      @receiver_class ||= case method_type
       when :class, :module
         receiver
       else
@@ -11,23 +11,25 @@ module Callgraph
       end
     end
 
+    def receiver_class_name
+      receiver_class.to_s
+    end
+
     def defined_class_name
       @defined_class_name ||= case method_type
-      when :class, :module
-        receiver_class.to_s
-      when :singleton
-        defined_class.to_s.match(/#<Class:(.*)>/).captures[0]
       when :instance
         defined_class.to_s
+      else
+        receiver_class.to_s
       end
     end
 
     def defined_path
-      source_location[0]
+      @defined_path ||= source_location[0]
     end
 
     def defined_line_number
-      source_location[1]
+      @defined_line_number ||= source_location[1]
     end
 
     def method_string
