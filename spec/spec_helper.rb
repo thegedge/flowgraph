@@ -2,6 +2,7 @@
 
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "callgraph"
+require "callgraph/hooks/rspec"
 
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|
@@ -33,4 +34,4 @@ end
 sqlite_recorder = Callgraph::Recorders::Sqlite.new("tmp/callgraph_tests")
 recorder = Callgraph::Recorders::Filtered.only(sqlite_recorder, File.join(__dir__, ".."))
 
-Callgraph::Hooks.install_rspec_hooks(recorder)
+Callgraph::Hooks::RSpec.install_hook(recorder)

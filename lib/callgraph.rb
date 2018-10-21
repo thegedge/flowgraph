@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "callgraph/event_defaults"
-require "callgraph/hooks"
 require "callgraph/rspec_example_event"
 require "callgraph/stack"
 require "callgraph/tracepoint_event"
