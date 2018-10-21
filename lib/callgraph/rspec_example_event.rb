@@ -18,7 +18,10 @@ module Callgraph
     end
 
     def source_location
-      @source_location ||= receiver.location.split(":")
+      @source_location ||= begin
+        path, lineno = receiver.location.split(":")
+        [File.expand_path(path), lineno.to_i]
+      end
     end
   end
 end
