@@ -5,7 +5,7 @@ module Callgraph
     module RSpec
       class << self
         def install_hook(recorder)
-          tracer = Tracer.new(rspec_filter(recorder))
+          tracer = Tracer.new(recorder)
 
           ::RSpec.configure do |config|
             config.around(:each) do |procsy|
@@ -18,17 +18,6 @@ module Callgraph
               tracer.trace { procsy.run }
               tracer.inject_event(RSpecExampleEvent.new(procsy.example, :return))
             end
-          end
-        end
-
-        private
-
-        def rspec_filter(recorder)
-          Recorders::Filtered.new(recorder) do |event|
-            next true if event.defined_class == ::RSpec::Core::Example
-            next false if event.defined_class.to_s.start_with?('RSpec::')
-            next false if event.defined_path.include?("/spec/")
-            true
           end
         end
       end
