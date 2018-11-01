@@ -22,7 +22,16 @@ module Callgraph
     let(:event) { :call }
     let(:method_name) { :foo }
     let(:tp_event) do
-      instance_double(TracePoint, defined_class: defined_class, event: event, method_id: method_name, self: receiver)
+      path, line = receiver.method(method_name).source_location
+      instance_double(
+        TracePoint,
+        event: event,
+        method_id: method_name,
+        self: receiver,
+        defined_class: defined_class,
+        path: path,
+        lineno: line,
+      )
     end
 
     subject { TracepointEvent.new(tp_event) }
