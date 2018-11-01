@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # frozen_string_literal: true
 require "callgraph"
 require "optparse"
@@ -9,8 +10,8 @@ options = {
   filter: [],
 }
 
-OptionParser.new do |opts|
-  opts.banner = "Usage: dump_calls.rb [options] file"
+op = OptionParser.new do |opts|
+  opts.banner = "Usage: dump_calls.rb [options] db_file"
 
   opts.on("-p", "--preview", "Output PNG and open") do |_|
     options[:preview] = true
@@ -30,9 +31,15 @@ OptionParser.new do |opts|
 
   opts.on("-h", "--help", "Prints this help") do
     puts opts
-    exit
+    exit 1
   end
-end.parse!
+end
+
+op.parse!
+if ARGV.length != 1
+  puts op
+  exit 1
+end
 
 File.open("callgraph.dot", "wt") do |f|
   f.write("strict digraph callgraph {\n")
@@ -63,8 +70,10 @@ File.open("callgraph.dot", "wt") do |f|
 
   # Now the edges
   method_calls.each do |mc|
-    next if options[:filter].include?(mc.source.receiver_class)
     next if mc.transitive && !options[:transitive]
+    next if options[:filter].any? do |f|
+      mc.source.receiver_class.to_s.include?(f) || mc.target.receiver_class.to_s.include?(f)
+    end
 
     f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
     f.write(" [style=dotted]") if mc.transitive
