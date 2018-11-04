@@ -4,6 +4,7 @@ require "callgraph"
 require "optparse"
 
 options = {
+  output: false,
   cluster: false,
   preview: false,
   transitive: false,
@@ -12,6 +13,10 @@ options = {
 
 op = OptionParser.new do |opts|
   opts.banner = "Usage: dump_calls.rb [options] db_file"
+
+  opts.on("-o", "--output", "Output PNG to callgraph.png") do |_|
+    options[:output] = true
+  end
 
   opts.on("-p", "--preview", "Output PNG and open") do |_|
     options[:preview] = true
@@ -83,7 +88,5 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("}\n")
 end
 
-if options[:preview]
-  `dot -Tpng callgraph.dot > callgraph.png`
-  `open callgraph.png`
-end
+`dot -Tpng callgraph.dot > callgraph.png` if options[:preview] || options[:output]
+`open callgraph.png` if options[:preview]
