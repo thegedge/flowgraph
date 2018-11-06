@@ -16,5 +16,13 @@ module Callgraph
     def trace
       @tracer.enable { yield }
     end
+
+    def start
+      @tracer.enable
+    end
+
+    def stop
+      @tracer.disable
+    end
   end
 end
