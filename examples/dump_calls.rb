@@ -8,7 +8,9 @@ options = {
   cluster: false,
   preview: false,
   transitive: false,
-  filter: [],
+  include: nil,
+  exclude: nil,
+  subtrees: nil,
 }
 
 op = OptionParser.new do |opts|
@@ -30,8 +32,16 @@ op = OptionParser.new do |opts|
     options[:transitive] = true
   end
 
-  opts.on("-f", "--filter=FILTER", String, "Comma-separated list of classes to filter") do |v|
-    options[:filter] = v.split(",")
+  opts.on("--include=REGEX", Regexp, "Only include nodes that match this regex") do |v|
+    options[:include] = v
+  end
+
+  opts.on("--exclude=REGEX", Regexp, "Exclude nodes that match this regex") do |v|
+    options[:exclude] = v
+  end
+
+  opts.on("--subtrees=REGEX", Regexp, "Only include nodes that are rooted at a node that matches this regex") do |v|
+    options[:subtrees] = v
   end
 
   opts.on("-h", "--help", "Prints this help") do
@@ -48,11 +58,43 @@ end
 
 File.open("callgraph.dot", "wt") do |f|
   f.write("strict digraph callgraph {\n")
-  f.write("  node[fontname=\"Source Code Pro\"]\n")
+  f.write("  node [fontname=\"Source Code Pro\",style=filled,fillcolor=white]\n")
+  f.write("  edge [color=black]\n")
   f.write("  fontname=\"Source Code Pro bold\"\n")
+  f.write("  ;\n")
 
   recorder = Callgraph::Recorders::Sqlite.new(ARGV[0])
-  method_calls = recorder.method_calls
+  method_calls = if options[:subtrees]
+    method_calls = recorder.method_calls.to_a
+
+    # Use transitive closure nodes to determine what ids to include
+    to_include = method_calls.each_with_object(Set.new) do |mc, to_include|
+      next if options[:subtrees] !~ mc.source.receiver_class.to_s
+      to_include << mc.source.id
+      to_include << mc.target.id
+    end
+
+    method_calls.select do |mc|
+      to_include.include?(mc.source.id) && to_include.include?(mc.target.id)
+    end
+  else
+    recorder.method_calls.to_a
+  end
+
+  method_calls = method_calls.select do |mc|
+    next false if mc.transitive && !options[:transitive]
+
+    if options[:include]
+      next false if options[:include] !~ mc.source.receiver_class.to_s
+      next false if options[:include] !~ mc.target.receiver_class.to_s
+    end
+    if options[:exclude]
+      next false if options[:exclude] =~ mc.source.receiver_class.to_s
+      next false if options[:exclude] =~ mc.target.receiver_class.to_s
+    end
+
+    true
+  end
 
   # Cluster the classes together
   if options[:cluster]
@@ -66,6 +108,9 @@ File.open("callgraph.dot", "wt") do |f|
     class_methods.each_with_index do |(clazz, methods), index|
       f.write("  subgraph cluster_#{index} {\n")
       f.write("    label = \"#{clazz}\";\n")
+      f.write("    color = gray50;\n")
+      f.write("    bgcolor = gray95;\n")
+      f.write("    fontcolor = gray50;\n")
       methods.each do |method|
         f.write("    \"#{method}\";\n")
       end
@@ -75,11 +120,6 @@ File.open("callgraph.dot", "wt") do |f|
 
   # Now the edges
   method_calls.each do |mc|
-    next if mc.transitive && !options[:transitive]
-    next if options[:filter].any? do |f|
-      mc.source.receiver_class.to_s.include?(f) || mc.target.receiver_class.to_s.include?(f)
-    end
-
     f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
     f.write(" [style=dotted]") if mc.transitive
     f.write(";\n")

@@ -7,10 +7,10 @@ module Callgraph
       METHODS_TABLE = "methods"
       METHOD_CALLS_TABLE = "method_calls"
 
-      _Method = Struct.new("Method", :name, :receiver_class, :defined_class, :path, :line_number, :type)
+      _Method = Struct.new("Method", :id, :name, :receiver_class, :defined_class, :path, :line_number, :type)
       class Method < _Method
-        def initialize(name, receiver_class, defined_class, path, line_number, type)
-          super(name, receiver_class, defined_class, path, line_number.to_i, type.to_sym)
+        def initialize(id, name, receiver_class, defined_class, path, line_number, type)
+          super(id.to_i, name, receiver_class, defined_class, path, line_number.to_i, type.to_sym)
         end
 
         def to_s
@@ -88,9 +88,9 @@ module Callgraph
       end
 
       def methods
-        rows = database.execute("SELECT id, #{Method.members.join(", ")} FROM #{METHODS_TABLE}")
-        rows.each_with_object({}) do |(id, *members), h|
-          h[id] = Method.new(*members)
+        rows = database.execute("SELECT #{Method.members.join(", ")} FROM #{METHODS_TABLE}")
+        rows.each_with_object({}) do |members, h|
+          h[members.first] = Method.new(*members)
         end
       end
 
