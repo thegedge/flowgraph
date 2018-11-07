@@ -58,6 +58,11 @@ module Callgraph
 
       def database
         @database ||= SQLite3::Database.new(@db_path).tap do |db|
+          db.locking_mode = 'exclusive'
+          db.temp_store = 'memory'
+          db.journal_mode = 'persist'
+          db.synchronous = 'off'
+
           db.execute_batch(
             "CREATE TABLE IF NOT EXISTS #{METHODS_TABLE} (
               id integer PRIMARY KEY AUTOINCREMENT,
