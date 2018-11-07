@@ -61,6 +61,8 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("  node [fontname=\"Source Code Pro\",style=filled,fillcolor=white]\n")
   f.write("  edge [color=black]\n")
   f.write("  fontname=\"Source Code Pro bold\"\n")
+  f.write("  nodesep=1\n")
+  f.write("  ranksep=2\n")
   f.write("  ;\n")
 
   recorder = Callgraph::Recorders::Sqlite.new(ARGV[0])
