@@ -87,12 +87,12 @@ File.open("callgraph.dot", "wt") do |f|
     next false if mc.transitive && !options[:transitive]
 
     if options[:include]
-      next false if options[:include] !~ mc.source.receiver_class.to_s
-      next false if options[:include] !~ mc.target.receiver_class.to_s
+      next false if options[:include] !~ mc.source.defined_class.to_s
+      next false if options[:include] !~ mc.target.defined_class.to_s
     end
     if options[:exclude]
-      next false if options[:exclude] =~ mc.source.receiver_class.to_s
-      next false if options[:exclude] =~ mc.target.receiver_class.to_s
+      next false if options[:exclude] =~ mc.source.defined_class.to_s
+      next false if options[:exclude] =~ mc.target.defined_class.to_s
     end
 
     true
@@ -102,8 +102,8 @@ File.open("callgraph.dot", "wt") do |f|
   if options[:cluster]
     class_methods = method_calls.each_with_object({}) do |mc, classes|
       [mc.source, mc.target].each do |method|
-        classes[method.receiver_class] ||= Set.new
-        classes[method.receiver_class] << method.to_s
+        classes[method.defined_class] ||= Set.new
+        classes[method.defined_class] << method.to_s
       end
     end
 
