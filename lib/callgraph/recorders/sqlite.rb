@@ -41,17 +41,21 @@ module Callgraph
         @stack << store_event(event)
         return unless @stack.length > 1
 
-        @stack.reverse.drop(1).each_with_index do |source, index|
-          # Ignore if part of the transitive closure
-          replace_op = (index == 0 ? "REPLACE" : "IGNORE")
+        # Insert the direct call
+        database.execute(
+          "INSERT OR REPLACE INTO #{METHOD_CALLS_TABLE}(source_id, target_id, transitive) VALUES(?, ?, ?)",
+          [
+            @stack[-2],
+            @stack[-1],
+            0
+          ],
+        )
 
+        # Insert the transitive calls
+        if @stack.length > 2
+          values = @stack.reverse.drop(1).map { |source| "(#{source},#{@stack.last},1)" }
           database.execute(
-            "INSERT OR #{replace_op} INTO #{METHOD_CALLS_TABLE}(source_id, target_id, transitive) VALUES(?, ?, ?)",
-            [
-              source,
-              @stack.last,
-              index == 0 ? 0 : 1,
-            ]
+            "INSERT OR IGNORE INTO #{METHOD_CALLS_TABLE}(source_id, target_id, transitive) VALUES #{values.join(",")}"
           )
         end
       end
