@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.11"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "simplecov"
 end
