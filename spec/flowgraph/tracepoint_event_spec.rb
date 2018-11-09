@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   class TestClass
     def self.foo
     end
@@ -40,11 +40,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: "Callgraph::TestClass#foo",
+          method_string: "Flowgraph::TestClass#foo",
           method_type: :instance,
-          defined_class_name: "Callgraph::TestClass",
+          defined_class_name: "Flowgraph::TestClass",
           defined_line_number: TestClass.instance_method(:foo).source_location.last,
-          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
+          defined_path: a_string_ending_with("spec/flowgraph/tracepoint_event_spec.rb")
         )
       end
     end
@@ -62,11 +62,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: "Callgraph::TestClass#foo (singleton)",
+          method_string: "Flowgraph::TestClass#foo (singleton)",
           method_type: :singleton,
-          defined_class_name: "Callgraph::TestClass",
+          defined_class_name: "Flowgraph::TestClass",
           defined_line_number: receiver.method(:foo).source_location.last,
-          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
+          defined_path: a_string_ending_with("spec/flowgraph/tracepoint_event_spec.rb")
         )
       end
     end
@@ -78,11 +78,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestClass,
-          method_string: "Callgraph::TestClass.foo",
+          method_string: "Flowgraph::TestClass.foo",
           method_type: :class,
-          defined_class_name: "Callgraph::TestClass",
+          defined_class_name: "Flowgraph::TestClass",
           defined_line_number: TestClass.method(:foo).source_location.last,
-          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
+          defined_path: a_string_ending_with("spec/flowgraph/tracepoint_event_spec.rb")
         )
       end
     end
@@ -94,11 +94,11 @@ module Callgraph
       it do
         is_expected.to have_attributes(
           receiver_class: TestModule,
-          method_string: "Callgraph::TestModule.foo",
+          method_string: "Flowgraph::TestModule.foo",
           method_type: :module,
-          defined_class_name: "Callgraph::TestModule",
+          defined_class_name: "Flowgraph::TestModule",
           defined_line_number: TestModule.method(:foo).source_location.last,
-          defined_path: a_string_ending_with("spec/callgraph/tracepoint_event_spec.rb")
+          defined_path: a_string_ending_with("spec/flowgraph/tracepoint_event_spec.rb")
         )
       end
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Callgraph
+module Flowgraph
   class Recorder
     def record(_tracepoint_event)
       raise NotImplementedError, "subclasses must implement #record"

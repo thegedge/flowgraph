@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "sqlite3"
 
-module Callgraph
+module Flowgraph
   module Recorders
     class Sqlite < Recorder
       METHODS_TABLE = "methods"

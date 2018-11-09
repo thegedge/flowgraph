@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   module Recorders
     DB_PATH = "tmp/sqlite_test"
 
@@ -15,14 +15,14 @@ module Callgraph
           method_name: "foo",
           receiver_class_name: "Foo",
           defined_class_name: "Test",
-          defined_path: "spec/callgraph/recorders/sqlite_spec.rb",
+          defined_path: "spec/flowgraph/recorders/sqlite_spec.rb",
           defined_line_number: 5,
           method_type: :class
         )
       end
 
       let(:method_a) do
-        Sqlite::Method.new(1, "foo", "Foo", "Test", "spec/callgraph/recorders/sqlite_spec.rb", 5, :class)
+        Sqlite::Method.new(1, "foo", "Foo", "Test", "spec/flowgraph/recorders/sqlite_spec.rb", 5, :class)
       end
 
       let(:call_event_b) do
@@ -32,14 +32,14 @@ module Callgraph
           method_name: "foo",
           receiver_class_name: "Bar",
           defined_class_name: "MyCoolClass",
-          defined_path: "spec/callgraph/recorders/sqlite_spec.rb",
+          defined_path: "spec/flowgraph/recorders/sqlite_spec.rb",
           defined_line_number: 13,
           method_type: :instance
         )
       end
 
       let(:method_b) do
-        Sqlite::Method.new(2, "foo", "Bar", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
+        Sqlite::Method.new(2, "foo", "Bar", "MyCoolClass", "spec/flowgraph/recorders/sqlite_spec.rb", 13, :instance)
       end
 
       let(:return_event) { instance_double(TracepointEvent, type: :return) }

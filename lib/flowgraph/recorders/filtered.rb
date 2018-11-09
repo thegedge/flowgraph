@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'pathname'
 
-module Callgraph
+module Flowgraph
   module Recorders
     class Filtered < Recorder
       class << self

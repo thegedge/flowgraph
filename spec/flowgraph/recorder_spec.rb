@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   RSpec.describe(Recorder) do
     context "#record" do
       it "must respond" do

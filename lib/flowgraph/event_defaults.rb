@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Callgraph
+module Flowgraph
   module EventDefaults
     def receiver_class
       @receiver_class ||= case method_type

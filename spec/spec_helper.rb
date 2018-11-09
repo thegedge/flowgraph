@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "callgraph"
-require "callgraph/hooks/rspec"
+require "flowgraph"
+require "flowgraph/hooks/rspec"
 
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|
@@ -31,7 +31,7 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 end
 
-sqlite_recorder = Callgraph::Recorders::Sqlite.new("tmp/callgraph_tests")
-recorder = Callgraph::Recorders::Filtered.only(sqlite_recorder, File.join(__dir__, ".."))
+sqlite_recorder = Flowgraph::Recorders::Sqlite.new("tmp/flowgraph_tests")
+recorder = Flowgraph::Recorders::Filtered.only(sqlite_recorder, File.join(__dir__, ".."))
 
-Callgraph::Hooks::RSpec.install_hook(recorder)
+Flowgraph::Hooks::RSpec.install_hook(recorder)

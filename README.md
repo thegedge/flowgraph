@@ -1,4 +1,4 @@
-# callgraph
+# flowgraph
 
 Generate a SQLite database containing a call graph for your Ruby code.
 
@@ -7,7 +7,7 @@ Generate a SQLite database containing a call graph for your Ruby code.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'callgraph'
+gem 'flowgraph'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install callgraph
+    $ gem install flowgraph
 
 ## Usage
 

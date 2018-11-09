@@ -7,6 +7,8 @@
 /pkg/
 /spec/reports/
 /tmp/
+
 *.sqlite3
 *.db
 .ruby-version
+Gemfile.lock

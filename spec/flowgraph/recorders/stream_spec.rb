@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   module Recorders
     RSpec.describe(Stream) do
       let(:stream) { StringIO.new }

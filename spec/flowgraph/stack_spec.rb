@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   RSpec.describe Stack do
     subject { Stack.new("stack_test") }
 

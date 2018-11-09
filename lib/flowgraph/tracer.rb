@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Callgraph
+module Flowgraph
   class Tracer
     def initialize(recorder)
       @recorder = recorder

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-module Callgraph
+module Flowgraph
   module Recorders
     RSpec.describe(Filtered) do
       let(:test_recorder) { double }

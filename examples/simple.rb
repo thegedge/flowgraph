@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "callgraph"
+require "flowgraph"
 require "benchmark"
 
 class A
@@ -37,9 +37,9 @@ class C < A
   end
 end
 
-recorder = Callgraph::Recorders::Sqlite.new("foo.sqlite3")
+recorder = Flowgraph::Recorders::Sqlite.new("foo.sqlite3")
 
-Callgraph.record(recorder) do
+Flowgraph.record(recorder) do
   b = B.new
   def b.baz
   end
@@ -48,4 +48,4 @@ Callgraph.record(recorder) do
 end
 
 #puts
-#Callgraph.record(recorder) { C.new.bar }
+#Flowgraph.record(recorder) { C.new.bar }

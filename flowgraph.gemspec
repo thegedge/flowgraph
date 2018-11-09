@@ -2,18 +2,18 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "callgraph/version"
+require "flowgraph/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "callgraph"
-  spec.version = Callgraph::VERSION
-  spec.authors = ["Jason Gedge"]
-  spec.email = ["jason@gedge.ca"]
-
-  spec.summary = "Generate a ruby callgraph database"
-  spec.description = "Profile a piece of code and generate a call graph from it"
-  spec.homepage = "https://gedge.ca"
+  spec.name = "flowgraph"
+  spec.version = Flowgraph::VERSION
+  spec.summary = "Record callgraphs from your Ruby code"
+  spec.description = "flowgraph instruments your ruby code so that you can inspect, record, and manipulate its call graph."
   spec.license = "MIT"
+
+  spec.author = "Jason Gedge"
+  spec.email = "jason@gedge.ca"
+  spec.homepage = "https://github.com/thegedge/flowgraph"
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})

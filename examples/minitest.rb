@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "benchmark"
-require "callgraph"
-require "callgraph/hooks/minitest"
+require "flowgraph"
+require "flowgraph/hooks/minitest"
 require "minitest/autorun"
 
 class A
@@ -51,5 +51,5 @@ class Test < Minitest::Test
   end
 end
 
-recorder = Callgraph::Recorders::Sqlite.new("foo.sqlite3")
-Callgraph::Hooks::Minitest.install_hook(recorder)
+recorder = Flowgraph::Recorders::Sqlite.new("foo.sqlite3")
+Flowgraph::Hooks::Minitest.install_hook(recorder)

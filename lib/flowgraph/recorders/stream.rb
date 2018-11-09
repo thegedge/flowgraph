@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Callgraph
+module Flowgraph
   module Recorders
     class Stream < Recorder
       def initialize(stream)

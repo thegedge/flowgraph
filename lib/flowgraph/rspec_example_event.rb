@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "forwardable"
 
-module Callgraph
+module Flowgraph
   class RSpecExampleEvent
     extend Forwardable
 

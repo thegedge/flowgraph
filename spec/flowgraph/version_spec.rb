@@ -2,8 +2,8 @@
 
 require "spec_helper"
 
-RSpec.describe Callgraph do
+RSpec.describe Flowgraph do
   context "::VERSION" do
-    it { expect(Callgraph::VERSION).to_not be_nil }
+    it { expect(Flowgraph::VERSION).to_not be_nil }
   end
 end

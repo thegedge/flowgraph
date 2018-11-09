@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Callgraph
+module Flowgraph
   module Hooks
     module Minitest
       class << self
