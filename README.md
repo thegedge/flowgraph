@@ -1,6 +1,6 @@
 # flowgraph
 
-Generate a SQLite database containing a call graph for your Ruby code.
+Simplifies recording and analyzing a call graph from your Ruby code.
 
 ## Installation
 
@@ -20,7 +20,33 @@ Or install it yourself as:
 
 ## Usage
 
-TODO
+Generate a SQLite database containing a call graph for your Ruby code:
+
+```ruby
+recorder = Flowgraph::Recorders::Sqlite.new("foo.sqlite3")
+Flowgraph.trace(recorder) do
+  # code to trace goes here
+end
+```
+
+Or filter out code that doesn't exist inside your project root:
+
+```ruby
+recorder = Flowgraph::Recorders::Filtered.only(sqlite_recorder, File.join(__dir__, ".."))
+```
+
+To simplify recording in tests, hooks are provided for popular test frameworks:
+
+```ruby
+# For RSpec, `in spec/spec_helper.rb`:
+Flowgraph::Hooks::RSpec.install_hook(recorder)
+
+# ...or for Minitest, in `test/test_helper.rb`
+Flowgraph::Hooks::Minitest.install_hook(recorder)
+```
+
+See the [`examples`](https://github.com/thegedge/flowgraph/tree/examples) directory for examples of
+how to use this gem.
 
 ## License
 
