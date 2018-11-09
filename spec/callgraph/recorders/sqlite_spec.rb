@@ -21,7 +21,9 @@ module Callgraph
         )
       end
 
-      let(:method_a) { Sqlite::Method.new("foo", "Foo", "Test", "spec/callgraph/recorders/sqlite_spec.rb", 5, :class) }
+      let(:method_a) do
+        Sqlite::Method.new(1, "foo", "Foo", "Test", "spec/callgraph/recorders/sqlite_spec.rb", 5, :class)
+      end
 
       let(:call_event_b) do
         instance_double(
@@ -37,17 +39,21 @@ module Callgraph
       end
 
       let(:method_b) do
-        Sqlite::Method.new("foo", "Bar", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
+        Sqlite::Method.new(2, "foo", "Bar", "MyCoolClass", "spec/callgraph/recorders/sqlite_spec.rb", 13, :instance)
       end
 
       let(:return_event) { instance_double(TracepointEvent, type: :return) }
 
+      subject { Sqlite.new(DB_PATH) }
+
       before(:each) { subject.database.transaction }
-      after(:each) { subject.database.rollback }
+
+      after(:each) do
+        subject.database.rollback
+        subject.database.close
+      end
 
       describe "#record" do
-        subject { Sqlite.new(DB_PATH) }
-
         it "writes a single event" do
           subject.record(call_event_a)
 
