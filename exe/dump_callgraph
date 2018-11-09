@@ -130,5 +130,5 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("}\n")
 end
 
-`dot -Tpng callgraph.dot > callgraph.png` if options[:preview] || options[:output]
-`open callgraph.png` if options[:preview]
+`dot -Tsvg callgraph.dot > callgraph.svg` if options[:preview] || options[:output]
+`open callgraph.svg` if options[:preview]
