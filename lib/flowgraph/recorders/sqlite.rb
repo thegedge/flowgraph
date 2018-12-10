@@ -13,14 +13,21 @@ module Flowgraph
           super(id.to_i, name, receiver_class, defined_class, path, line_number.to_i, type.to_sym)
         end
 
-        def to_s
+        def prefix
           case type
           when :module, :class
-            "#{defined_class}.#{name}"
-          when :singleton
-            "#{defined_class}##{name} (singleton)"
+            "."
           else
-            "#{defined_class}##{name}"
+            "#"
+          end
+        end
+
+        def to_s
+          case type
+          when :singleton
+            "#{defined_class}#{prefix}#{name} (singleton)"
+          when :module, :class
+            "#{defined_class}#{prefix}#{name}"
           end
         end
       end

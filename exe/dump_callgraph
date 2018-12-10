@@ -60,9 +60,10 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("strict digraph callgraph {\n")
   f.write("  node [fontname=\"Source Code Pro\",style=filled,fillcolor=white]\n")
   f.write("  edge [color=black]\n")
-  f.write("  fontname=\"Source Code Pro bold\"\n")
+  f.write("  fontname=\"Source Code Pro\"\n")
   f.write("  nodesep=1\n")
   f.write("  ranksep=2\n")
+  f.write("  dpi=50\n")
   f.write("  ;\n")
 
   recorder = Flowgraph::Recorders::Sqlite.new(ARGV[0])
@@ -103,18 +104,19 @@ File.open("callgraph.dot", "wt") do |f|
     class_methods = method_calls.each_with_object({}) do |mc, classes|
       [mc.source, mc.target].each do |method|
         classes[method.defined_class] ||= Set.new
-        classes[method.defined_class] << method.to_s
+        classes[method.defined_class] << method
       end
     end
 
     class_methods.each_with_index do |(clazz, methods), index|
       f.write("  subgraph cluster_#{index} {\n")
-      f.write("    label = \"#{clazz}\";\n")
-      f.write("    color = gray50;\n")
-      f.write("    bgcolor = gray95;\n")
-      f.write("    fontcolor = gray50;\n")
+      f.write("    label=<<b>#{clazz}</b>>;\n")
+      f.write("    fontsize=24;\n")
+      f.write("    color=gray50;\n")
+      f.write("    bgcolor=gray95;\n")
+      f.write("    fontcolor=gray50;\n")
       methods.each do |method|
-        f.write("    \"#{method}\";\n")
+        f.write("    \"#{method}\" [label=\"#{method.prefix}#{method.name}\"];\n")
       end
       f.write("  }\n\n")
     end
