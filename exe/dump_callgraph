@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-require "callgraph"
+require "flowgraph"
 require "optparse"
 
 options = {
@@ -65,7 +65,7 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("  ranksep=2\n")
   f.write("  ;\n")
 
-  recorder = Callgraph::Recorders::Sqlite.new(ARGV[0])
+  recorder = Flowgraph::Recorders::Sqlite.new(ARGV[0])
   method_calls = if options[:subtrees]
     method_calls = recorder.method_calls.to_a
 
