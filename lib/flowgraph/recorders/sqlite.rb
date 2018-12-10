@@ -16,11 +16,11 @@ module Flowgraph
         def to_s
           case type
           when :module, :class
-            "#{receiver_class}.#{name}"
+            "#{defined_class}.#{name}"
           when :singleton
-            "#{receiver_class}##{name} (singleton)"
+            "#{defined_class}##{name} (singleton)"
           else
-            "#{receiver_class}##{name}"
+            "#{defined_class}##{name}"
           end
         end
       end

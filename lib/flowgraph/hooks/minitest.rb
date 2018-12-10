@@ -8,13 +8,12 @@ module Flowgraph
           tracer = Tracer.new(recorder)
 
           ext = Module.new
-          ext.send(:define_method, :after_setup) do
-            super()
-            tracer.start
-          end
+          ext.send(:define_method, :run) do
+            # Define a singleton version of the test to reduce scope of tracer
+            self.define_singleton_method(self.name) do
+              tracer.trace { super() }
+            end
 
-          ext.send(:define_method, :before_teardown) do
-            tracer.stop
             super()
           end
 
