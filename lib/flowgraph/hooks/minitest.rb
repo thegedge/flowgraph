@@ -7,8 +7,8 @@ module Flowgraph
         def install_hook(recorder)
           tracer = Tracer.new(recorder)
 
-          ext = Module.new
-          ext.send(:define_method, :run) do
+          @ext ||= Module.new
+          @ext.send(:define_method, :run) do
             # Define a singleton version of the test to reduce scope of tracer
             self.define_singleton_method(self.name) do
               tracer.trace { super() }
@@ -17,7 +17,7 @@ module Flowgraph
             super()
           end
 
-          ::Minitest::Test.send(:prepend, ext)
+          ::Minitest::Test.send(:prepend, @ext)
         end
       end
     end
