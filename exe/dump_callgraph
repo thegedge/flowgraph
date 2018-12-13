@@ -17,11 +17,11 @@ options = {
 op = OptionParser.new do |opts|
   opts.banner = "Usage: dump_calls.rb [options] db_file"
 
-  opts.on("-o", "--output", "Output PNG to callgraph.png") do |_|
-    options[:output] = true
+  opts.on("-o[FORMAT]", "--output[=FORMAT]", "Render graph to callgraph.FORMAT") do |v|
+    options[:output] = v || 'svg'
   end
 
-  opts.on("-p", "--preview", "Output PNG and open") do |_|
+  opts.on("-p", "--preview", "Output and open generated graph") do |_|
     options[:preview] = true
   end
 
@@ -122,10 +122,6 @@ File.open("callgraph.dot", "wt") do |f|
       end
       f.write("  }\n\n")
     end
-  else
-    methods.each do |method|
-      f.write("  \"#{method}\" [label=\"#{method.prefix}#{method.name}\"];\n")
-    end
   end
 
   # Now the edges
@@ -142,5 +138,6 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("}\n")
 end
 
-`dot -Tsvg callgraph.dot > callgraph.svg` if options[:preview] || options[:output]
-`open callgraph.svg` if options[:preview]
+format = options[:output] || 'svg'
+`dot -T#{format} callgraph.dot > callgraph.#{format}` if options[:preview] || options[:output]
+`open callgraph.#{format}` if options[:preview]
