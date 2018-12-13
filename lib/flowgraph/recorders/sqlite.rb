@@ -23,10 +23,9 @@ module Flowgraph
         end
 
         def to_s
-          case type
-          when :singleton
+          if type == :singleton
             "#{defined_class}#{prefix}#{name} (singleton)"
-          when :module, :class
+          else
             "#{defined_class}#{prefix}#{name}"
           end
         end

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+require "cgi"
 require "flowgraph"
 require "optparse"
 
@@ -58,7 +59,7 @@ end
 
 File.open("callgraph.dot", "wt") do |f|
   f.write("strict digraph callgraph {\n")
-  f.write("  node [fontname=\"Source Code Pro\",style=filled,fillcolor=white]\n")
+  f.write("  node [fontname=\"Source Code Pro\" style=\"filled,rounded\" shape=rect fillcolor=white]\n")
   f.write("  edge [color=black]\n")
   f.write("  fontname=\"Source Code Pro\"\n")
   f.write("  nodesep=1\n")
@@ -67,21 +68,20 @@ File.open("callgraph.dot", "wt") do |f|
   f.write("  ;\n")
 
   recorder = Flowgraph::Recorders::Sqlite.new(ARGV[0])
-  method_calls = if options[:subtrees]
-    method_calls = recorder.method_calls.to_a
 
+  method_calls = recorder.method_calls.uniq.to_a
+
+  if options[:subtrees]
     # Use transitive closure nodes to determine what ids to include
     to_include = method_calls.each_with_object(Set.new) do |mc, to_include|
-      next if options[:subtrees] !~ mc.source.receiver_class.to_s
+      next if options[:subtrees] !~ mc.source.defined_class.to_s
       to_include << mc.source.id
       to_include << mc.target.id
     end
 
-    method_calls.select do |mc|
+    method_calls = method_calls.select do |mc|
       to_include.include?(mc.source.id) && to_include.include?(mc.target.id)
     end
-  else
-    recorder.method_calls.to_a
   end
 
   method_calls = method_calls.select do |mc|
@@ -109,8 +109,10 @@ File.open("callgraph.dot", "wt") do |f|
     end
 
     class_methods.each_with_index do |(clazz, methods), index|
+      next if methods.empty?
+
       f.write("  subgraph cluster_#{index} {\n")
-      f.write("    label=<<b>#{clazz}</b>>;\n")
+      f.write("    label=<<b>#{CGI.escapeHTML(clazz)}</b>>;\n")
       f.write("    fontsize=24;\n")
       f.write("    color=gray50;\n")
       f.write("    bgcolor=gray95;\n")
@@ -120,12 +122,20 @@ File.open("callgraph.dot", "wt") do |f|
       end
       f.write("  }\n\n")
     end
+  else
+    methods.each do |method|
+      f.write("  \"#{method}\" [label=\"#{method.prefix}#{method.name}\"];\n")
+    end
   end
 
   # Now the edges
   method_calls.each do |mc|
     f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
-    f.write(" [style=dotted]") if mc.transitive
+
+    styles = []
+    styles << "style=dotted" if mc.transitive
+
+    f.write(" [#{styles.join(" ")}]")
     f.write(";\n")
   end
 
