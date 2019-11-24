@@ -9,6 +9,7 @@ options = {
   cluster: false,
   preview: false,
   transitive: false,
+  classes_only: false,
   include: nil,
   exclude: nil,
   subtrees: nil,
@@ -31,6 +32,10 @@ op = OptionParser.new do |opts|
 
   opts.on("-t", "--transitive", String, "Draw edges for the transitive closure") do |v|
     options[:transitive] = true
+  end
+
+  opts.on("--classes-only", "Only render class dependencies") do |_|
+    options[:classes_only] = true
   end
 
   opts.on("--include=REGEX", Regexp, "Only include nodes that match this regex") do |v|
@@ -99,40 +104,56 @@ File.open("callgraph.dot", "wt") do |f|
     true
   end
 
-  # Cluster the classes together
-  if options[:cluster]
-    class_methods = method_calls.each_with_object({}) do |mc, classes|
-      [mc.source, mc.target].each do |method|
-        classes[method.defined_class] ||= Set.new
-        classes[method.defined_class] << method
+  if options[:classes_only]
+    # Just render classes that depend on each other
+    classes = method_calls.each_with_object({}) do |mc, classes|
+      next if mc.transitive # TODO support transitive dependencies
+
+      classes[mc.source.defined_class] ||= Set.new
+      classes[mc.source.defined_class] << mc.target.defined_class
+    end
+
+    classes.each do |source, targets|
+      targets.each do |target|
+        f.write("  \"#{source}\" -> \"#{target}\";\n")
+      end
+    end
+  else
+    # Cluster the classes together
+    if options[:cluster]
+      class_methods = method_calls.each_with_object({}) do |mc, classes|
+        [mc.source, mc.target].each do |method|
+          classes[method.defined_class] ||= Set.new
+          classes[method.defined_class] << method
+        end
+      end
+
+      class_methods.each_with_index do |(clazz, methods), index|
+        next if methods.empty?
+
+        f.write("  subgraph cluster_#{index} {\n")
+        f.write("    label=<<b>#{CGI.escapeHTML(clazz)}</b>>;\n")
+        f.write("    fontsize=24;\n")
+        f.write("    color=gray50;\n")
+        f.write("    bgcolor=gray95;\n")
+        f.write("    fontcolor=gray50;\n")
+        methods.each do |method|
+          f.write("    \"#{method}\" [label=\"#{method.prefix}#{method.name}\"];\n")
+        end
+        f.write("  }\n\n")
       end
     end
 
-    class_methods.each_with_index do |(clazz, methods), index|
-      next if methods.empty?
+    # Now the edges
+    method_calls.each do |mc|
+      f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
 
-      f.write("  subgraph cluster_#{index} {\n")
-      f.write("    label=<<b>#{CGI.escapeHTML(clazz)}</b>>;\n")
-      f.write("    fontsize=24;\n")
-      f.write("    color=gray50;\n")
-      f.write("    bgcolor=gray95;\n")
-      f.write("    fontcolor=gray50;\n")
-      methods.each do |method|
-        f.write("    \"#{method}\" [label=\"#{method.prefix}#{method.name}\"];\n")
-      end
-      f.write("  }\n\n")
+      styles = []
+      styles << "style=dotted" if mc.transitive
+
+      f.write(" [#{styles.join(" ")}]")
+      f.write(";\n")
     end
-  end
-
-  # Now the edges
-  method_calls.each do |mc|
-    f.write("  \"#{mc.source}\" -> \"#{mc.target}\"")
-
-    styles = []
-    styles << "style=dotted" if mc.transitive
-
-    f.write(" [#{styles.join(" ")}]")
-    f.write(";\n")
   end
 
   f.write("}\n")
