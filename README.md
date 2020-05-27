@@ -7,16 +7,12 @@ Simplifies recording and analyzing a call graph from your Ruby code.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'flowgraph'
+gem 'flowgraph', github: 'thegedge/flowgraph'
 ```
 
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install flowgraph
 
 ## Usage
 
@@ -45,7 +41,7 @@ Flowgraph::Hooks::RSpec.install_hook(recorder)
 Flowgraph::Hooks::Minitest.install_hook(recorder)
 ```
 
-See the [`examples`](https://github.com/thegedge/flowgraph/tree/examples) directory for examples of
+See the [`examples`](https://github.com/thegedge/flowgraph/tree/master/examples) directory for examples of
 how to use this gem.
 
 ## License
